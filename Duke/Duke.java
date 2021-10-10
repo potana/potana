@@ -1,5 +1,7 @@
 package Duke.Duke;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -13,7 +15,7 @@ public class Duke{
 
     public static ArrayList<Task> arr = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ArrayList<String> arr = new ArrayList<String>();
         arr = new ArrayList<String>();
         arr.add("morning");
@@ -44,6 +46,7 @@ public class Duke{
             line = sc.nextLine();
         }
         System.out.println("Bye. Hope to see you again!");
+        writeListToFile();
     }
 
     public static void list(String command) {
@@ -107,5 +110,28 @@ public class Duke{
         {
             System.out.println("☹ OOPS!!! The description of a todo cannot be empty.");
         }
+    }
+    private static void writeListToFile() throws IOException {
+        FileWriter fw = new FileWriter("data/duke.txt");
+        StringBuilder sb = new StringBuilder();
+        for (Task entry : arr) {
+            if (entry instanceof Deadline) {
+                sb.append(String.format("D | %s | %s | %s", entry.done() ? "1" : "0",
+                        entry.getTaskName(), ((Deadline) entry).getDatetime() ));
+            } else if (entry instanceof Event) {
+                sb.append(String.format("E | %s | %s | %s", entry.done() ? "1" : "0",
+                        entry.getTaskName(), ((Event) entry).getDatetime() ));
+            } else if (entry instanceof Todo) {
+                sb.append(String.format("T | %s | %s", entry.done() ? "1" : "0",
+                        entry.getTaskName() ));
+            }
+
+            sb.append(System.lineSeparator());
+            fw.write(sb.toString());
+            sb = new StringBuilder();
+        }
+
+        fw.close();
+
     }
 }
