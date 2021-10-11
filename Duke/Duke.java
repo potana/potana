@@ -1,21 +1,29 @@
 package Duke.Duke;
 
-import java.io.FileWriter;
+import java.util.Scanner;
+import java.util.ArrayList;
+
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Scanner;
+import java.io.FileWriter;
 
-import java.util.Scanner;
-import java.util.ArrayList;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class Duke{
 
     public static ArrayList<Task> arr = new ArrayList<>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException{
+        File f = new File("data/duke.txt");
+        System.out.println("full path: " + f.getAbsolutePath());
+        System.out.println("file exists?: " + f.exists());
+        System.out.println("is Directory?: " + f.isDirectory());
         ArrayList<String> arr = new ArrayList<String>();
         arr = new ArrayList<String>();
         arr.add("morning");
@@ -25,7 +33,7 @@ public class Duke{
         while (! line.toLowerCase().equals("bye")) {
             checkList(line);
             if (line.equals("list")) {
-                list(line);
+                getlist();
             } else if (line.split(" ")[0].equals("done")) {
                 int num = Integer.parseInt(line.split(" ")[1]);
                 markAsDone(num);
@@ -49,7 +57,12 @@ public class Duke{
         writeListToFile();
     }
 
-    public static void list(String command) {
+    /**
+     * Returns all the task in the array arr back into the console
+     *
+     * @return number of task in the arrayList.
+     */
+    private static void getlist(){
         System.out.println("Here are the tasks in your list:");
         int index  = 1;
         for (Task task : arr) {
@@ -58,52 +71,111 @@ public class Duke{
         }
     }
 
-    public static void markAsDone(int num) {
+    /**
+     * Takes the num and marks the task as done
+     * by replacing the " " with a "X"
+     *
+     * @param num number in the arrayList
+     */
+    private static void markAsDone(int num){
         if (num <= 0 || num > arr.size() ) {
-            System.out.println("Number is out of range");
+            System.out.println("OOPS!!! Number is out of range");
         } else {
-            arr.get(num - 1).done();
+            arr.get(num-1).hasDone();
+            arr.get(num-1).hasDone();
+
+            printDoneTask(arr.get(num-1));
         }
     }
 
-    public static void addToDo(String taskName) {
+    /**
+     * The adds a task into the arrayList
+     *
+     * @param taskName the name of the task.
+     */
+    private static void addToDo(String taskName) {
         Todo newTodo = new Todo(taskName);
         arr.add(newTodo);
         printAddedTask();
     }
 
-    public static void printAddedTask() {
+    /**
+     * Prints into the system when a task is mark as done
+     *
+     * @param t is the task that is marked to be done
+     */
+    private static void printDoneTask(Task t) {
+        System.out.println("Nice! I've marked this task as done");
+        System.out.println(String.format("    %s", t));
+    }
+
+    /**
+     * Prints out that a task has been added
+     */
+    private static void printAddedTask() {
         System.out.println("Got it. I've added this task: ");
         System.out.println(String.format("    %s", arr.get(arr.size()-1).toString()));
         System.out.println(String.format("Now you have %d tasks in the list.", arr.size()));
     }
 
-    public static void printRemoveTask(Task t) {
+    /**
+     * Prints out that a task has been removed
+     */
+    private static void printRemoveTask(Task t) {
         System.out.println("Noted. I've removed this task: ");
         System.out.println(String.format("    %s",t));
         System.out.println(String.format("Now you have %d tasks in the list.", arr.size()));
     }
-    public static void addDeadline(String taskName, String datetime) {
-        Deadline deadline = new Deadline(taskName,datetime);
+
+    /**
+     * Adds a deadline into the arrayList task
+     *
+     * @param taskName name to register the task by
+     * @param dateTime the time of the deadline
+     */
+    private static void addDeadline(String taskName, String dateTime) {
+        LocalDateTime dateTimeObj = parseDateTime(dateTime);
+        Deadline deadline = new Deadline(taskName,dateTimeObj);
         arr.add(deadline);
         printAddedTask();
     }
 
-    public static void addEvent(String taskName, String datetime) {
-        Event event = new Event(taskName, datetime);
+    /**
+     * Adds an event into the arrayList task
+     *
+     * @param taskName name to register the task by
+     * @param dateTime the time of the event
+     */
+    private static void addEvent(String taskName, String dateTime) {
+        LocalDateTime dateTimeObj = parseDateTime(dateTime);
+        Event event = new Event(taskName, dateTimeObj);
         arr.add(event);
         printAddedTask();
     }
-    public static void removeTask(int number) {
-        Task rmv_t = arr.remove(number-1);
-        printRemoveTask(rmv_t);
+
+    /**
+     * removes a task from the arrayList
+     *
+     * @param number the number of the task it is located at
+     */
+    private static void removeTask(int number) {
+        Task removeTask = arr.remove(number-1);
+        printRemoveTask(removeTask);
     }
-    public static void checkList(String line){
+
+    /**
+     * checks if the input has any errors
+     * and notifies the user
+     *
+     * @param line the input of the user
+     */
+    private static void checkList(String line){
         if(!line.split(" ")[0].equals("done") &&
                 !line.split(" ")[0].equals("delete") &&
                 !line.split(" ")[0].equals("event") &&
                 !line.split(" ")[0].equals("deadline") &&
-                !line.split(" ")[0].equals("todo")){
+                !line.split(" ")[0].equals("todo") &&
+                !line.split(" ")[0].equals("list")){
             System.out.println("☹ OOPS!!! I'm sorry, but I don't know what that means :-(");
         }
         else if(line.split("   ")[0].equals("todo"))
@@ -111,18 +183,24 @@ public class Duke{
             System.out.println("☹ OOPS!!! The description of a todo cannot be empty.");
         }
     }
+
+    /**
+     * Changes the content of duke.txt by appending information into it
+     *
+     * @throws IOException Java exception which occurs when an IO operations fails
+     */
     private static void writeListToFile() throws IOException {
         FileWriter fw = new FileWriter("data/duke.txt");
         StringBuilder sb = new StringBuilder();
         for (Task entry : arr) {
             if (entry instanceof Deadline) {
-                sb.append(String.format("D | %s | %s | %s", entry.done() ? "1" : "0",
+                sb.append(String.format("D | %s | %s | %s", entry.hasDone() ? "1" : "0",
                         entry.getTaskName(), ((Deadline) entry).getDatetime() ));
             } else if (entry instanceof Event) {
-                sb.append(String.format("E | %s | %s | %s", entry.done() ? "1" : "0",
+                sb.append(String.format("E | %s | %s | %s", entry.hasDone() ? "1" : "0",
                         entry.getTaskName(), ((Event) entry).getDatetime() ));
             } else if (entry instanceof Todo) {
-                sb.append(String.format("T | %s | %s", entry.done() ? "1" : "0",
+                sb.append(String.format("T | %s | %s", entry.hasDone() ? "1" : "0",
                         entry.getTaskName() ));
             }
 
@@ -133,5 +211,21 @@ public class Duke{
 
         fw.close();
 
+    }
+
+    /**
+     * Returns the time in another format.
+     *
+     * @param datetime the user input for time in any format
+     * @return the date time in year month and day
+     */
+    private static LocalDateTime parseDateTime(String datetime) {
+        int spaceIndex = datetime.indexOf(" ");
+        String[] stringArr = datetime.split("/");
+
+        int day = Integer.parseInt(stringArr[0]);
+        int month = Integer.parseInt(stringArr[1]);
+        int year = Integer.parseInt(stringArr[2]);
+        return LocalDateTime.of(year,month,day,0,0);
     }
 }

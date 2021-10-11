@@ -12,7 +12,7 @@ public class Task {
         return String.format("[%s][%s] %s", this.getType() ,isDone ? "X": " ", taskName );
     }
 
-    public boolean done() {
+    public boolean hasDone() {
         return this.isDone = true;
     }
 

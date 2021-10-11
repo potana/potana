@@ -1,10 +1,12 @@
 package Duke.Duke;
 
+import java.time.LocalDateTime;
+
 public class Deadline extends Task {
 
-    private String datetime;
+    private LocalDateTime datetime;
 
-    public Deadline(String taskName, String datetime) {
+    public Deadline(String taskName, LocalDateTime datetime) {
         super(taskName);
         this.datetime = datetime;
     }
@@ -14,18 +16,18 @@ public class Deadline extends Task {
         return "D";
     }
 
-    public String getDatetime() {
+    public LocalDateTime getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
+    public void setDatetime(LocalDateTime datetime) {
         this.datetime = datetime;
     }
 
     @Override
     public String toString() {
-        return String.format("[%s][%s] %s (by: %s)",
-                this.getType() ,isDone ? "\u2713": "\u2718",
+        return String.format("[%s][%s] %s (by: %d)",
+                this.getType() ,isDone ? "X": " ",
                 this.taskName, this.datetime);
     }
 }
