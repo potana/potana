@@ -4,15 +4,10 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.FileWriter;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
 public class Duke{
@@ -50,6 +45,9 @@ public class Duke{
                 addEvent(line.substring(spaceIndex+1, backslashIndex-1), line.substring(backslashIndex+4));
             }else if (line.split(" ")[0].equals("delete")) {
                 removeTask(Integer.parseInt(line.split(" ")[1]));
+            }else if (line.split(" ")[0].equals("find")) {
+                int spaceIndex = line.indexOf(" ");
+                search(line.substring(spaceIndex+1));
             }
             line = sc.nextLine();
         }
@@ -195,10 +193,10 @@ public class Duke{
         for (Task entry : arr) {
             if (entry instanceof Deadline) {
                 sb.append(String.format("D | %s | %s | %s", entry.hasDone() ? "1" : "0",
-                        entry.getTaskName(), ((Deadline) entry).getDatetime() ));
+                        entry.getTaskName(), ((Deadline) entry).getDateTime() ));
             } else if (entry instanceof Event) {
                 sb.append(String.format("E | %s | %s | %s", entry.hasDone() ? "1" : "0",
-                        entry.getTaskName(), ((Event) entry).getDatetime() ));
+                        entry.getTaskName(), ((Event) entry).getDateTime() ));
             } else if (entry instanceof Todo) {
                 sb.append(String.format("T | %s | %s", entry.hasDone() ? "1" : "0",
                         entry.getTaskName() ));
@@ -227,5 +225,17 @@ public class Duke{
         int month = Integer.parseInt(stringArr[1]);
         int year = Integer.parseInt(stringArr[2]);
         return LocalDateTime.of(year,month,day,0,0);
+    }
+
+    public static void search(String ... keywords)
+    {
+        String keyword = keywords[0];
+        String taskWithKeyword = "";
+        for(Task task: arr) {
+            if(task.getTaskName().contains(keyword)) {
+                taskWithKeyword += "    " + task.toString() + "\n";
+            }
+        }
+        System.out.println("    Here are the matching tasks in your list:\n" + taskWithKeyword);
     }
 }

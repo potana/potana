@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class Deadline extends Task {
 
-    private LocalDateTime datetime;
+    private LocalDateTime dateTime;
 
     public Deadline(String taskName, LocalDateTime datetime) {
         super(taskName);
-        this.datetime = datetime;
+        this.dateTime = datetime;
     }
 
     @Override
@@ -16,18 +16,18 @@ public class Deadline extends Task {
         return "D";
     }
 
-    public LocalDateTime getDatetime() {
-        return datetime;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setDatetime(LocalDateTime datetime) {
-        this.datetime = datetime;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     @Override
     public String toString() {
-        return String.format("[%s][%s] %s (by: %d)",
+        return String.format("[%s][%s] %s (by: %d/%d/%d)",
                 this.getType() ,isDone ? "X": " ",
-                this.taskName, this.datetime);
+                this.taskName, this.dateTime.getYear(), this.dateTime.getMonthValue(), this.dateTime.getDayOfMonth());
     }
 }
